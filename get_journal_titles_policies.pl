@@ -13,6 +13,9 @@ use Data::Dumper;
 
 #use Data::Dumper;
 
+#Repository Name, e.g.: Spectrum, used for formatting autocomplete text
+my $repositoryName= "";
+
 #Specify your Sherpa Romeo API key
 my $api_key = "";
 
@@ -117,10 +120,10 @@ sub processBatch{
 			
 			my $permitted_oa_versions="";
 			
-			my $summary_for_spectrum_conditions = "";
-			my $summary_for_spectrum_prerequisites = "";
-			my $summary_for_spectrum_prerequisite_funders = "";
-			my $summary_for_spectrum_prerequisite_subjects = "";
+			my $summary_for_IR_conditions = "";
+			my $summary_for_IR_prerequisites = "";
+			my $summary_for_IR_prerequisite_funders = "";
+			my $summary_for_IR_prerequisite_subjects = "";
 			
 			my $versions = "version";
 			
@@ -148,35 +151,35 @@ sub processBatch{
 							$permitted_oa_versions =~ s/,\s*$//;
 							
 							#get prerequisites' string
-							$summary_for_spectrum_prerequisites = "";
+							$summary_for_IR_prerequisites = "";
 							if (defined ($temp->{'prerequisites'}->{'prerequisites'})) {
 								foreach (@{$temp->{'prerequisites'}->{'prerequisites'}}) {
-								  $summary_for_spectrum_prerequisites .= "<li>".$_."</li>";
+								  $summary_for_IR_prerequisites .= "<li>".$_."</li>";
 								}
 							}
 							
 							#get prerequisites' funders string
-							$summary_for_spectrum_prerequisite_funders = "";
+							$summary_for_IR_prerequisite_funders = "";
 							if (defined ($temp->{'prerequisites'}->{'prerequisite_funders'})) {
 								foreach (@{$temp->{'prerequisites'}->{'prerequisite_funders'}}) {
-								  $summary_for_spectrum_prerequisite_funders .= "<li>".$_->{'funder_metadata'}->{name}->[0]->{name}."</li>";
+								  $summary_for_IR_prerequisite_funders .= "<li>".$_->{'funder_metadata'}->{name}->[0]->{name}."</li>";
 								}
 							}
 							
 							#get prerequisites' subject string
-							$summary_for_spectrum_prerequisite_subjects = "";
+							$summary_for_IR_prerequisite_subjects = "";
 							if (defined ($temp->{'prerequisites'}->{'prerequisite_subjects'})) {
 								foreach (@{$temp->{'prerequisites'}->{'prerequisite_subjects'}}) {
-								  $summary_for_spectrum_prerequisite_subjects .= "<li>".$_."</li>";
-								  print STDOUT $summary_for_spectrum_prerequisite_subjects;
+								  $summary_for_IR_prerequisite_subjects .= "<li>".$_."</li>";
+								  print STDOUT $summary_for_IR_prerequisite_subjects;
 								}
 							}
 							
 							#get conditions' string
-							$summary_for_spectrum_conditions = "";
+							$summary_for_IR_conditions = "";
 							if (defined ($temp->{'conditions'})) {
 								foreach (@{$temp->{'conditions'}}) {
-								  $summary_for_spectrum_conditions .= "<li>".$_."</li>";
+								  $summary_for_IR_conditions .= "<li>".$_."</li>";
 								}
 							}
 							
@@ -194,12 +197,12 @@ sub processBatch{
 							
 							$PolicySummary[$i][0]=$permitted_oa_versions;
 							#print STDOUT $permitted_oa_versions;
-							$PolicySummary[$i][1]=$summary_for_spectrum_conditions;
-							#print STDOUT $summary_for_spectrum_conditions;
+							$PolicySummary[$i][1]=$summary_for_IR_conditions;
+							#print STDOUT $summary_for_IR_conditions;
 							$PolicySummary[$i][2]=$embargo_period;
-							$PolicySummary[$i][3]=$summary_for_spectrum_prerequisites;
-							$PolicySummary[$i][4]=$summary_for_spectrum_prerequisite_funders;
-							$PolicySummary[$i][5]=$summary_for_spectrum_prerequisite_subjects;
+							$PolicySummary[$i][3]=$summary_for_IR_prerequisites;
+							$PolicySummary[$i][4]=$summary_for_IR_prerequisite_funders;
+							$PolicySummary[$i][5]=$summary_for_IR_prerequisite_subjects;
 							$PolicySummary[$i][6]="";
 							$PolicySummary[$i][7]=$license;
 					  }
@@ -224,7 +227,7 @@ sub processBatch{
 			}
 			$permitted_oa_versions =~ s/,\s*$//;
 			
-			my $summary_for_spectrum = "";
+			my $summary_for_IR = "";
 			
 
 			
@@ -233,13 +236,13 @@ sub processBatch{
 				$return_str .="<li style='border-right: solid 50px #dfeccf'>";
 				$return_str .=$title." published by ".$publisher_name."<br />";
 			
-				$return_str .= "<small>".$permitted_oa_versions." ".$versions." can be archived in Spectrum.</small>";
+				$return_str .= "<small>".$permitted_oa_versions." ".$versions." can be archived in ".$repositoryName.".</small>";
 			}else{
 			
 				$return_str .="<li style='border-right: solid 50px #f0f0f0'>";
 				$return_str .=$title." published by ".$publisher_name."<br />";
 				
-				$return_str .= "<small>No version can be archived in Spectrum.</small>";
+				$return_str .= "<small>No version can be archived in ".$repositoryName.".</small>";
 			}
 	
 			
@@ -262,10 +265,10 @@ sub processBatch{
 					}
 				}
 				if (! $possible_with_fee){
-					$return_str .='The depositor cannot archive any version in Spectrum.';
+					$return_str .='The depositor cannot archive any version in '.$repositoryName.'.';
 				}
 				else{
-					$return_str .='The depositor cannot archive any version in Spectrum without an additional open access fee to the publisher.';
+					$return_str .='The depositor cannot archive any version in '.$repositoryName.' without an additional open access fee to the publisher.';
 				}
 				
 			}
@@ -320,14 +323,6 @@ sub processBatch{
 				}
 			}
 			
-			#if (! $summary_for_spectrum eq ""){
-			#	$return_str .= "<p>".$summary_for_spectrum.".</p>";
-			#	}
-			
-			#$return_str .= $summary_for_spectrum_conditions;
-			
-			
-		
 			$return_str .="</li></ul></li>\n";
 			
 			
