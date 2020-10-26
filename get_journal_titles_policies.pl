@@ -13,6 +13,9 @@ use Data::Dumper;
 
 #use Data::Dumper;
 
+#Specify your Sherpa Romeo API key
+my $api_key = "";
+
 #Specify the file
 my $out_file = "/opt/eprints3/archives/library/cfg/autocomplete/romeo_journals.autocomplete";
 my $construct_file = "/opt/eprints3/archives/library/cfg/autocomplete/romeo_journals.construct";
@@ -27,12 +30,40 @@ my $step=100;
 my $offset=0;
 my $max=99999;
 
+if ($api_key eq ""){
+	print STDOUT "You must set a Sherpa Romeo api_key.  Exiting.\n";
+	$done = 1;
+}
+
 while (!$done){
 	$done = fetchBatch ($step, $offset);
 	$offset=$offset+$step;
 	print STDOUT $offset."\n";
     last if ($offset > $max);
 }
+
+sub contains_one_of
+{
+				my ($strings, $matches) = @_;
+
+				foreach my $string (@{$strings})
+				{
+								return 1 if equals_one_of($string, $matches);
+				}
+				return 0;
+}
+
+sub equals_one_of
+{
+				my ($string, $matches) = @_;
+
+				foreach my $match (@{$matches})
+				{
+								return 1 if $string eq $match;
+				}
+				return 0;
+}
+
 
 sub uniq {
     my %seen;
@@ -45,8 +76,8 @@ sub fetchBatch{
     my ($limit, $offset) = @_;
 	
 	my $done = 0;
-  my $SherpaAPIKey = ''; #set this to your Sherpa API key
-	my $query = "https://v2.sherpa.ac.uk/cgi/retrieve?item-type=publication&api-key=".$SherpaAPIKey."&format=Json&limit=".$limit."&offset=".$offset;
+	
+	my $query = "https://v2.sherpa.ac.uk/cgi/retrieve?item-type=publication&api-key=".$api_key."&format=Json&limit=".$limit."&offset=".$offset;
 	#print STDOUT $query."\n";
 	my $request = HTTP::Request->new(GET => "$query");
 	my $ua = LWP::UserAgent->new();
@@ -97,8 +128,11 @@ sub processBatch{
 			
 			my $i=0;
 			my @unique_versions = ();
+			my $interesting_locations = [qw/ institutional_repository any_website non_commercial_repository non_commercial_institutional_repository any_repository  /];
+
 			foreach my $temp (@{$items->{'publisher_policy'}->[0]->{'permitted_oa'}}){
-					if ( grep( /^institutional_repository|any_website|non_commercial_repository|non_commercial_institutional_repository|any_repository/, @{$temp->{'location'}->{'location'}} ) ) {
+					if (contains_one_of($temp->{'location'}->{'location'}, $interesting_locations)) {
+
 					#for each policy that has permitted_oa and appropriate location
 					
 					   #check to filter our any additional OA fees
