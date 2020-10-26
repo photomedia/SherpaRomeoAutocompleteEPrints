@@ -19,9 +19,12 @@ my $repositoryName= "";
 #Specify your Sherpa Romeo API key
 my $api_key = "";
 
-#Specify the file
-my $out_file = "/opt/eprints3/archives/library/cfg/autocomplete/romeo_journals.autocomplete";
-my $construct_file = "/opt/eprints3/archives/library/cfg/autocomplete/romeo_journals.construct";
+#Specify the file, out_file is the final file, construct_file is the in-progress file
+#the location should be set to where you have the autocomplete file, normally /opt/eprints3/archives/REPOID/cfg/autocomplete/
+#out_file should be something like /opt/eprints3/archives/REPOID/cfg/autocomplete/romeo_journals.autocomplete
+my $out_file = "";
+#construct_file should be something like /opt/eprints3/archives/REPOID/cfg/autocomplete/romeo_journals.construct
+my $construct_file = "";
 
 #Open same file for writing, reusing STDOUT
 open (OUTFILE, ">$construct_file") or die "Can't open $construct_file: $!\n";
@@ -35,6 +38,21 @@ my $max=99999;
 
 if ($api_key eq ""){
 	print STDOUT "You must set a Sherpa Romeo api_key.  Exiting.\n";
+	$done = 1;
+}
+
+if ($out_file eq ""){
+	print STDOUT "You must set out_file.  Exiting.\n";
+	$done = 1;
+}
+
+if ($construct_file eq ""){
+	print STDOUT "You must set construct_file.  Exiting.\n";
+	$done = 1;
+}
+
+if ($repositoryName eq ""){
+	print STDOUT "You must set repositoryName.  Exiting.\n";
 	$done = 1;
 }
 
